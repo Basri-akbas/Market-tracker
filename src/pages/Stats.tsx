@@ -10,6 +10,8 @@ const Stats: React.FC = () => {
         let totalRevenue = 0;
         let totalCost = 0;
         let profitableCount = 0;
+        let totalMarkup = 0;
+        let productCount = 0;
 
         products.forEach(product => {
             if (product.suppliers.length > 0) {
@@ -20,12 +22,32 @@ const Stats: React.FC = () => {
                 if (product.salesPrice > lowestPrice) {
                     profitableCount++;
                 }
+
+                // Calculate individual product markup (profit / cost * 100)
+                const productProfit = product.salesPrice - lowestPrice;
+                const productMarkup = lowestPrice > 0 ? (productProfit / lowestPrice) * 100 : 0;
+
+                console.log(`${product.brand} ${product.name}:`, {
+                    salesPrice: product.salesPrice,
+                    lowestCost: lowestPrice,
+                    profit: productProfit,
+                    markup: productMarkup.toFixed(2) + '%'
+                });
+
+                totalMarkup += productMarkup;
+                productCount++;
             }
         });
 
         const totalProfit = totalRevenue - totalCost;
-        // Profit margin = (profit / cost) * 100
-        const overallMargin = totalCost > 0 ? (totalProfit / totalCost) * 100 : 0;
+        // Average markup = sum of all product markups / number of products
+        const overallMargin = productCount > 0 ? totalMarkup / productCount : 0;
+
+        console.log('Overall Stats:', {
+            productCount,
+            totalMarkup: totalMarkup.toFixed(2),
+            averageMarkup: overallMargin.toFixed(2) + '%'
+        });
 
         return {
             totalProducts: products.length,
@@ -90,7 +112,7 @@ const Stats: React.FC = () => {
                         <Percent size={24} />
                     </div>
                     <div>
-                        <div className="text-sm text-slate-500">Ort. Kâr Marjı</div>
+                        <div className="text-sm text-slate-500">Ort. Kâr Oranı</div>
                         <div className="text-2xl font-bold">
                             %{stats.overallMargin.toFixed(1)}
                         </div>
