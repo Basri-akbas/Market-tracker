@@ -224,6 +224,36 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
         );
     };
 
+    const deleteSupplier = async (supplierName: string) => {
+        try {
+            // Find all products that have this supplier
+            const affectedProducts = products.filter(p =>
+                p.suppliers.some(s => s.name === supplierName)
+            );
+
+            // Update each product to remove this supplier
+            const batch = writeBatch(db);
+            affectedProducts.forEach(product => {
+                const updatedSuppliers = product.suppliers.filter(s => s.name !== supplierName);
+                const productRef = doc(db, 'products', product.id);
+                batch.update(productRef, { suppliers: updatedSuppliers });
+            });
+
+            await batch.commit();
+
+            // Update local state
+            setProducts(prevProducts =>
+                prevProducts.map(product => ({
+                    ...product,
+                    suppliers: product.suppliers.filter(s => s.name !== supplierName)
+                }))
+            );
+        } catch (error) {
+            console.error('Error deleting supplier:', error);
+            alert('Tedarikçi silinirken hata oluştu.');
+        }
+    };
+
     const getProductsBySupplier = (supplierName: string): SupplierInfo | null => {
         const suppliers = getUniqueSuppliers();
         return suppliers.find((s) => s.name === supplierName) || null;
@@ -239,6 +269,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
             updateProduct,
             getUniqueSuppliers,
             getProductsBySupplier,
+            deleteSupplier,
             addReturn,
             updateReturn,
             toggleReturnStatus,

@@ -1,22 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Package, Search } from 'lucide-react';
+import { Users, Package, Search, Trash2 } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 
 const SupplierList: React.FC = () => {
-    const { getUniqueSuppliers } = useProducts();
+    const { products, getUniqueSuppliers, deleteSupplier } = useProducts();
     const [searchTerm, setSearchTerm] = useState('');
 
-    const suppliers = useMemo(() => getUniqueSuppliers(), [getUniqueSuppliers]);
+    const suppliers = useMemo(() => getUniqueSuppliers(), [products, getUniqueSuppliers]);
 
-    const filteredSuppliers = useMemo(() => {
-        const term = searchTerm.toLowerCase().trim();
-        if (!term) return suppliers;
-
-        return suppliers.filter((s) =>
-            s.name.toLowerCase().includes(term)
-        );
-    }, [suppliers, searchTerm]);
+    const term = searchTerm.toLowerCase().trim();
+    const filteredSuppliers = term
+        ? suppliers.filter((s) => s.name.toLowerCase().includes(term))
+        : suppliers;
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -70,8 +66,23 @@ const SupplierList: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="text-slate-300 group-hover:text-emerald-500">
-                                →
+                            <div className="flex items-center gap-2">
+                                <div className="text-slate-300 group-hover:text-emerald-500">
+                                    →
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (window.confirm(`"${supplier.name}" tedarikçisini silmek istediğinize emin misiniz? Bu işlem tüm ürünlerden bu tedarikçiyi kaldıracaktır.`)) {
+                                            deleteSupplier(supplier.name);
+                                        }
+                                    }}
+                                    className="p-2 text-red-300 hover:text-red-500 transition-colors"
+                                    title="Tedarikçiyi Sil"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
                             </div>
                         </Link>
                     ))

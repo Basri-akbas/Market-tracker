@@ -53,6 +53,7 @@ export interface ProductContextType {
   updateProduct: (id: string, product: Partial<Product>) => void;
   getUniqueSuppliers: () => SupplierInfo[];
   getProductsBySupplier: (supplierName: string) => SupplierInfo | null;
+  deleteSupplier: (supplierName: string) => void;
   addReturn: (item: Omit<ReturnItem, 'id'>) => void;
   updateReturn: (id: string, item: Partial<ReturnItem>) => void;
   toggleReturnStatus: (id: string, currentStatus: boolean) => void;
