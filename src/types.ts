@@ -54,6 +54,7 @@ export interface ProductContextType {
   getUniqueSuppliers: () => SupplierInfo[];
   getProductsBySupplier: (supplierName: string) => SupplierInfo | null;
   addReturn: (item: Omit<ReturnItem, 'id'>) => void;
+  updateReturn: (id: string, item: Partial<ReturnItem>) => void;
   toggleReturnStatus: (id: string, currentStatus: boolean) => void;
   deleteReturn: (id: string) => void;
   addSupplierPhoto: (photo: Omit<SupplierPhoto, 'id'>) => void;

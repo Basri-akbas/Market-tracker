@@ -6,7 +6,7 @@ import { useProducts } from '../context/ProductContext';
 const SupplierReturns: React.FC = () => {
     const { supplierName } = useParams<{ supplierName: string }>();
     const navigate = useNavigate();
-    const { returns, addReturn, toggleReturnStatus, deleteReturn, supplierPhotos, addSupplierPhoto, deleteSupplierPhoto } = useProducts();
+    const { returns, addReturn, updateReturn, toggleReturnStatus, deleteReturn, supplierPhotos, addSupplierPhoto, deleteSupplierPhoto } = useProducts();
     const decodedName = decodeURIComponent(supplierName || '');
 
     const [showAddForm, setShowAddForm] = useState(false);
@@ -91,7 +91,7 @@ const SupplierReturns: React.FC = () => {
             quantity: newItem.quantity,
             date: Date.now(),
             isReturned: false,
-            image: newItem.image || undefined,
+            image: newItem.image || null,
         });
 
         setNewItem({ brand: '', productName: '', weight: '', quantity: 1, image: '' });
@@ -110,8 +110,7 @@ const SupplierReturns: React.FC = () => {
                     const compressed = await compressImage(file);
                     const returnRef = returns.find(r => r.id === itemId);
                     if (returnRef) {
-                        await addReturn({
-                            ...returnRef,
+                        await updateReturn(itemId, {
                             image: compressed,
                         });
                     }

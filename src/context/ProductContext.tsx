@@ -115,6 +115,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     const deleteProduct = async (id: string) => {
         try {
             await deleteDoc(doc(db, 'products', id));
+            setProducts(prevProducts => prevProducts.filter(p => p.id !== id));
         } catch (error) {
             console.error('Error deleting product:', error);
             alert('Ürün silinirken hata oluştu.');
@@ -140,6 +141,16 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
         }
     };
 
+    const updateReturn = async (id: string, item: Partial<ReturnItem>) => {
+        try {
+            const returnRef = doc(db, 'returns', id);
+            await setDoc(returnRef, { ...item }, { merge: true });
+        } catch (error) {
+            console.error('Error updating return:', error);
+            alert('İade güncellenirken hata oluştu.');
+        }
+    };
+
     const toggleReturnStatus = async (id: string, currentStatus: boolean) => {
         try {
             const returnRef = doc(db, 'returns', id);
@@ -152,6 +163,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     const deleteReturn = async (id: string) => {
         try {
             await deleteDoc(doc(db, 'returns', id));
+            setReturns(prevReturns => prevReturns.filter(r => r.id !== id));
         } catch (error) {
             console.error('Error deleting return:', error);
         }
@@ -228,6 +240,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
             getUniqueSuppliers,
             getProductsBySupplier,
             addReturn,
+            updateReturn,
             toggleReturnStatus,
             deleteReturn,
             addSupplierPhoto,
