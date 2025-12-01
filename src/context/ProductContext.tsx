@@ -177,6 +177,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     const getUniqueSuppliers = (): SupplierInfo[] => {
         const supplierMap = new Map<string, SupplierInfo>();
 
+        // First, initialize all suppliers
         products.forEach((product) => {
             product.suppliers.forEach((supplier) => {
                 if (!supplierMap.has(supplier.name)) {
@@ -186,19 +187,23 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
                         products: [],
                     });
                 }
+            });
+        });
 
-                const supplierInfo = supplierMap.get(supplier.name)!;
-                const existingProduct = supplierInfo.products.find(
-                    (p) => p.product.id === product.id
-                );
+        // Then, add each product only to its cheapest supplier
+        products.forEach((product) => {
+            if (product.suppliers.length === 0) return;
 
-                if (!existingProduct) {
-                    supplierInfo.productCount++;
-                    supplierInfo.products.push({
-                        product,
-                        price: supplier.price,
-                    });
-                }
+            // Find the cheapest supplier for this product
+            const cheapestSupplier = product.suppliers.reduce((min, current) =>
+                current.price < min.price ? current : min
+            );
+
+            const supplierInfo = supplierMap.get(cheapestSupplier.name)!;
+            supplierInfo.productCount++;
+            supplierInfo.products.push({
+                product,
+                price: cheapestSupplier.price,
             });
         });
 
