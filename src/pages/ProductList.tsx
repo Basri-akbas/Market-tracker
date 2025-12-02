@@ -48,19 +48,36 @@ const ProductList: React.FC = () => {
             <div className="card mb-6 p-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="input-group mb-0">
+                        <label className="label">Barkod Ara</label>
                         <div className="flex gap-2">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3 top-3 text-slate-400" size={20} />
-                                <input
-                                    type="text"
-                                    className="input pl-10 w-full"
-                                    placeholder="Barkod, Ürün Adı, Marka veya Tedarikçi ile arayın..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    autoFocus
-                                />
-                            </div>
+                            <input
+                                type="text"
+                                className="input flex-1"
+                                placeholder="Barkod numarasını girin ve Enter'a basın"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        const target = e.target as HTMLInputElement;
+                                        if (target.value.trim()) {
+                                            setSearchTerm(target.value.trim());
+                                            target.value = '';
+                                        }
+                                    }
+                                }}
+                            />
                             <BarcodeScanner onScan={(barcode) => setSearchTerm(barcode)} />
+                        </div>
+                    </div>
+                    <div className="input-group mb-0">
+                        <label className="label">Genel Arama</label>
+                        <div className="relative">
+                            <Search className="absolute left-3 top-3 text-slate-400" size={20} />
+                            <input
+                                type="text"
+                                className="input pl-10 w-full"
+                                placeholder="Ürün Adı, Marka veya Tedarikçi"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                     <div className="input-group mb-0">
