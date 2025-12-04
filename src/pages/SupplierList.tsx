@@ -9,6 +9,7 @@ const SupplierList: React.FC = () => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [newSupplierName, setNewSupplierName] = useState('');
 
+    // Get all suppliers (both from collection and products)
     const suppliers = useMemo(() => getUniqueSuppliers(), [products, getUniqueSuppliers]);
 
     const term = searchTerm.toLowerCase().trim();
