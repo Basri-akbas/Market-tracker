@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const AddProduct: React.FC = () => {
     const navigate = useNavigate();
-    const { addProduct } = useProducts();
+    const { addProduct, suppliers: availableSuppliers, addSupplier } = useProducts();
     const barcodeInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
@@ -27,6 +27,9 @@ const AddProduct: React.FC = () => {
     ]);
 
     const [error, setError] = useState<string | null>(null);
+    const [showAddSupplierModal, setShowAddSupplierModal] = useState(false);
+    const [newSupplierName, setNewSupplierName] = useState('');
+    const [currentSupplierIndex, setCurrentSupplierIndex] = useState<number | null>(null);
 
     useEffect(() => {
         // Auto-focus barcode input on mount
@@ -39,6 +42,13 @@ const AddProduct: React.FC = () => {
     };
 
     const handleSupplierChange = (index: number, field: keyof Omit<Supplier, 'id'>, value: string | number) => {
+        // Check if user selected "+ Yeni Tedarikçi"
+        if (field === 'name' && value === '__new__') {
+            setCurrentSupplierIndex(index);
+            setShowAddSupplierModal(true);
+            return;
+        }
+
         const newSuppliers = [...suppliers];
         newSuppliers[index] = { ...newSuppliers[index], [field]: value };
         setSuppliers(newSuppliers);
@@ -196,13 +206,19 @@ const AddProduct: React.FC = () => {
                             <div key={index} className="flex gap-3 items-end">
                                 <div className="input-group flex-1 mb-0">
                                     <label className="label text-xs mb-1">Firma Adı</label>
-                                    <input
-                                        type="text"
+                                    <select
                                         value={supplier.name}
                                         onChange={(e) => handleSupplierChange(index, 'name', e.target.value)}
                                         className="input py-2"
-                                        placeholder={`Firma ${index + 1}`}
-                                    />
+                                    >
+                                        <option value="">Seçiniz...</option>
+                                        {availableSuppliers.map((s) => (
+                                            <option key={s.id} value={s.name}>
+                                                {s.name}
+                                            </option>
+                                        ))}
+                                        <option value="__new__">+ Yeni Tedarikçi</option>
+                                    </select>
                                 </div>
                                 <div className="input-group w-32 mb-0">
                                     <label className="label text-xs mb-1">Alış Fiyatı</label>
@@ -240,6 +256,64 @@ const AddProduct: React.FC = () => {
                     </button>
                 </div>
             </form>
+
+            {/* Add Supplier Modal */}
+            {showAddSupplierModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="card max-w-md w-full mx-4">
+                        <h2 className="text-xl font-semibold mb-4">Yeni Tedarikçi Ekle</h2>
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            if (newSupplierName.trim()) {
+                                await addSupplier(newSupplierName.trim());
+
+                                // Set the new supplier name in the current dropdown
+                                if (currentSupplierIndex !== null) {
+                                    const newSuppliers = [...suppliers];
+                                    newSuppliers[currentSupplierIndex] = {
+                                        ...newSuppliers[currentSupplierIndex],
+                                        name: newSupplierName.trim()
+                                    };
+                                    setSuppliers(newSuppliers);
+                                }
+
+                                setNewSupplierName('');
+                                setShowAddSupplierModal(false);
+                                setCurrentSupplierIndex(null);
+                            }
+                        }}>
+                            <div className="input-group">
+                                <label className="label">Tedarikçi Adı</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    placeholder="Tedarikçi adını girin"
+                                    value={newSupplierName}
+                                    onChange={(e) => setNewSupplierName(e.target.value)}
+                                    autoFocus
+                                    required
+                                />
+                            </div>
+                            <div className="flex gap-2 justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowAddSupplierModal(false);
+                                        setNewSupplierName('');
+                                        setCurrentSupplierIndex(null);
+                                    }}
+                                    className="btn btn-secondary"
+                                >
+                                    İptal
+                                </button>
+                                <button type="submit" className="btn btn-primary">
+                                    Ekle
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
