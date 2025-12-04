@@ -4,13 +4,29 @@ import { Users, Package, Search, Trash2, Plus } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 
 const SupplierList: React.FC = () => {
-    const { products, getUniqueSuppliers, deleteSupplier, addSupplier } = useProducts();
+    const { products, suppliers: availableSuppliers, getUniqueSuppliers, deleteSupplier, addSupplier } = useProducts();
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
     const [newSupplierName, setNewSupplierName] = useState('');
 
-    // Get all suppliers (both from collection and products)
-    const suppliers = useMemo(() => getUniqueSuppliers(), [products, getUniqueSuppliers]);
+    // Combine suppliers from collection and products
+    const suppliers = useMemo(() => {
+        const supplierMap = new Map<string, { name: string; productCount: number }>();
+
+        // Add from products
+        getUniqueSuppliers().forEach(s => {
+            supplierMap.set(s.name, { name: s.name, productCount: s.productCount });
+        });
+
+        // Add from suppliers collection (if not already in products)
+        availableSuppliers.forEach(s => {
+            if (!supplierMap.has(s.name)) {
+                supplierMap.set(s.name, { name: s.name, productCount: 0 });
+            }
+        });
+
+        return Array.from(supplierMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    }, [products, availableSuppliers, getUniqueSuppliers]);
 
     const term = searchTerm.toLowerCase().trim();
     const filteredSuppliers = term
