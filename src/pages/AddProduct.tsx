@@ -8,8 +8,21 @@ import { v4 as uuidv4 } from 'uuid';
 
 const AddProduct: React.FC = () => {
     const navigate = useNavigate();
-    const { addProduct, suppliers: availableSuppliers, addSupplier } = useProducts();
+    const { addProduct, suppliers: availableSuppliers, addSupplier, getUniqueSuppliers } = useProducts();
     const barcodeInputRef = useRef<HTMLInputElement>(null);
+
+    // Combine suppliers from collection and products
+    const allSuppliers = React.useMemo(() => {
+        const supplierNames = new Set<string>();
+
+        // Add from suppliers collection
+        availableSuppliers.forEach(s => supplierNames.add(s.name));
+
+        // Add from products (legacy suppliers)
+        getUniqueSuppliers().forEach(s => supplierNames.add(s.name));
+
+        return Array.from(supplierNames).sort();
+    }, [availableSuppliers, getUniqueSuppliers]);
 
     const [formData, setFormData] = useState({
         barcode: '',
@@ -212,9 +225,9 @@ const AddProduct: React.FC = () => {
                                         className="input py-2"
                                     >
                                         <option value="">Seçiniz...</option>
-                                        {availableSuppliers.map((s) => (
-                                            <option key={s.id} value={s.name}>
-                                                {s.name}
+                                        {allSuppliers.map((name) => (
+                                            <option key={name} value={name}>
+                                                {name}
                                             </option>
                                         ))}
                                         <option value="__new__">+ Yeni Tedarikçi</option>
