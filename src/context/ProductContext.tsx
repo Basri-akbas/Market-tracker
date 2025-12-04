@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { Product, ProductContextType, SupplierInfo, ReturnItem, SupplierPhoto } from '../types';
+import type { Product, ProductContextType, SupplierInfo, ReturnItem, SupplierPhoto, SupplierEntity } from '../types';
 import { db } from '../firebase';
 import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, writeBatch, setDoc } from 'firebase/firestore';
 
@@ -12,6 +12,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [products, setProducts] = useState<Product[]>([]);
     const [returns, setReturns] = useState<ReturnItem[]>([]);
     const [supplierPhotos, setSupplierPhotos] = useState<SupplierPhoto[]>([]);
+    const [suppliers, setSuppliers] = useState<SupplierEntity[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Initial load and subscription for products
@@ -58,6 +59,22 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
             })) as SupplierPhoto[];
 
             setSupplierPhotos(photosData);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    // Subscription for suppliers
+    useEffect(() => {
+        const q = query(collection(db, 'suppliers'), orderBy('createdAt', 'desc'));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const suppliersData = snapshot.docs.map(doc => ({
+                ...doc.data(),
+                id: doc.id
+            })) as SupplierEntity[];
+
+            setSuppliers(suppliersData);
         });
 
         return () => unsubscribe();
@@ -224,8 +241,33 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
         );
     };
 
+    const addSupplier = async (name: string) => {
+        try {
+            // Check if supplier already exists
+            const existingSupplier = suppliers.find(s => s.name.toLowerCase() === name.toLowerCase());
+            if (existingSupplier) {
+                alert('Bu tedarikçi zaten mevcut.');
+                return;
+            }
+
+            await addDoc(collection(db, 'suppliers'), {
+                name,
+                createdAt: Date.now()
+            });
+        } catch (error) {
+            console.error('Error adding supplier:', error);
+            alert('Tedarikçi eklenirken hata oluştu.');
+        }
+    };
+
     const deleteSupplier = async (supplierName: string) => {
         try {
+            // Find and delete from suppliers collection
+            const supplierToDelete = suppliers.find(s => s.name === supplierName);
+            if (supplierToDelete) {
+                await deleteDoc(doc(db, 'suppliers', supplierToDelete.id));
+            }
+
             // Find all products that have this supplier
             const affectedProducts = products.filter(p =>
                 p.suppliers.some(s => s.name === supplierName)
@@ -264,12 +306,14 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
             products,
             returns,
             supplierPhotos,
+            suppliers,
             addProduct,
             deleteProduct,
             updateProduct,
             getUniqueSuppliers,
             getProductsBySupplier,
             deleteSupplier,
+            addSupplier,
             addReturn,
             updateReturn,
             toggleReturnStatus,

@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Package, Search, Trash2 } from 'lucide-react';
+import { Users, Package, Search, Trash2, Plus } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 
 const SupplierList: React.FC = () => {
-    const { products, getUniqueSuppliers, deleteSupplier } = useProducts();
+    const { products, getUniqueSuppliers, deleteSupplier, addSupplier } = useProducts();
     const [searchTerm, setSearchTerm] = useState('');
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newSupplierName, setNewSupplierName] = useState('');
 
     const suppliers = useMemo(() => getUniqueSuppliers(), [products, getUniqueSuppliers]);
 
@@ -18,8 +20,17 @@ const SupplierList: React.FC = () => {
         <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <h1>Tedarikçiler</h1>
-                <div className="text-sm text-slate-500">
-                    Toplam {suppliers.length} tedarikçi
+                <div className="flex items-center gap-4">
+                    <div className="text-sm text-slate-500">
+                        Toplam {suppliers.length} tedarikçi
+                    </div>
+                    <button
+                        onClick={() => setShowAddForm(true)}
+                        className="btn btn-primary flex items-center gap-2"
+                    >
+                        <Plus size={20} />
+                        Yeni Tedarikçi
+                    </button>
                 </div>
             </div>
 
@@ -88,6 +99,51 @@ const SupplierList: React.FC = () => {
                     ))
                 )}
             </div>
+
+            {/* Add Supplier Modal */}
+            {showAddForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="card max-w-md w-full mx-4">
+                        <h2 className="text-xl font-semibold mb-4">Yeni Tedarikçi Ekle</h2>
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            if (newSupplierName.trim()) {
+                                await addSupplier(newSupplierName.trim());
+                                setNewSupplierName('');
+                                setShowAddForm(false);
+                            }
+                        }}>
+                            <div className="input-group">
+                                <label className="label">Tedarikçi Adı</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    placeholder="Tedarikçi adını girin"
+                                    value={newSupplierName}
+                                    onChange={(e) => setNewSupplierName(e.target.value)}
+                                    autoFocus
+                                    required
+                                />
+                            </div>
+                            <div className="flex gap-2 justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowAddForm(false);
+                                        setNewSupplierName('');
+                                    }}
+                                    className="btn btn-secondary"
+                                >
+                                    İptal
+                                </button>
+                                <button type="submit" className="btn btn-primary">
+                                    Ekle
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

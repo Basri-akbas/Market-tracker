@@ -44,16 +44,24 @@ export interface SupplierPhoto {
   date: number;
 }
 
+export interface SupplierEntity {
+  id: string;
+  name: string;
+  createdAt: number;
+}
+
 export interface ProductContextType {
   products: Product[];
   returns: ReturnItem[];
   supplierPhotos: SupplierPhoto[];
+  suppliers: SupplierEntity[];
   addProduct: (product: Product) => void;
   deleteProduct: (id: string) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
   getUniqueSuppliers: () => SupplierInfo[];
   getProductsBySupplier: (supplierName: string) => SupplierInfo | null;
   deleteSupplier: (supplierName: string) => void;
+  addSupplier: (name: string) => Promise<void>;
   addReturn: (item: Omit<ReturnItem, 'id'>) => void;
   updateReturn: (id: string, item: Partial<ReturnItem>) => void;
   toggleReturnStatus: (id: string, currentStatus: boolean) => void;
