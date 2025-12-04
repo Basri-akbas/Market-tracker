@@ -1,13 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Package, Search, Trash2, Plus } from 'lucide-react';
+import { Users, Package, Search, Trash2, Plus, Edit2 } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 
 const SupplierList: React.FC = () => {
-    const { products, suppliers: availableSuppliers, getUniqueSuppliers, deleteSupplier, addSupplier } = useProducts();
+    const { products, suppliers: availableSuppliers, getUniqueSuppliers, deleteSupplier, addSupplier, updateSupplier } = useProducts();
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
     const [newSupplierName, setNewSupplierName] = useState('');
+    const [showEditForm, setShowEditForm] = useState(false);
+    const [editingSupplier, setEditingSupplier] = useState<string | null>(null);
+    const [editSupplierName, setEditSupplierName] = useState('');
 
     // Combine suppliers from collection and products
     const suppliers = useMemo(() => {
@@ -102,6 +105,19 @@ const SupplierList: React.FC = () => {
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
+                                        setEditingSupplier(supplier.name);
+                                        setEditSupplierName(supplier.name);
+                                        setShowEditForm(true);
+                                    }}
+                                    className="p-2 text-blue-300 hover:text-blue-500 transition-colors"
+                                    title="Tedarikçiyi Düzenle"
+                                >
+                                    <Edit2 size={18} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
                                         if (window.confirm(`"${supplier.name}" tedarikçisini silmek istediğinize emin misiniz? Bu işlem tüm ürünlerden bu tedarikçiyi kaldıracaktır.`)) {
                                             deleteSupplier(supplier.name);
                                         }
@@ -155,6 +171,53 @@ const SupplierList: React.FC = () => {
                                 </button>
                                 <button type="submit" className="btn btn-primary">
                                     Ekle
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Supplier Modal */}
+            {showEditForm && editingSupplier && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="card max-w-md w-full mx-4">
+                        <h2 className="text-xl font-semibold mb-4">Tedarikçiyi Düzenle</h2>
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            if (editSupplierName.trim() && editingSupplier) {
+                                await updateSupplier(editingSupplier, editSupplierName.trim());
+                                setEditSupplierName('');
+                                setShowEditForm(false);
+                                setEditingSupplier(null);
+                            }
+                        }}>
+                            <div className="input-group">
+                                <label className="label">Tedarikçi Adı</label>
+                                <input
+                                    type="text"
+                                    className="input"
+                                    placeholder="Tedarikçi adını girin"
+                                    value={editSupplierName}
+                                    onChange={(e) => setEditSupplierName(e.target.value)}
+                                    autoFocus
+                                    required
+                                />
+                            </div>
+                            <div className="flex gap-2 justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowEditForm(false);
+                                        setEditSupplierName('');
+                                        setEditingSupplier(null);
+                                    }}
+                                    className="btn btn-secondary"
+                                >
+                                    İptal
+                                </button>
+                                <button type="submit" className="btn btn-primary">
+                                    Güncelle
                                 </button>
                             </div>
                         </form>

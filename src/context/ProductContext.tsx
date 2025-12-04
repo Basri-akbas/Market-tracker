@@ -260,6 +260,66 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
         }
     };
 
+    const updateSupplier = async (oldName: string, newName: string) => {
+        try {
+            // Validation
+            if (!newName.trim()) {
+                alert('Tedarikçi adı boş olamaz.');
+                return;
+            }
+
+            if (oldName === newName) {
+                return; // No change
+            }
+
+            // Check if new name already exists
+            const existingSupplier = suppliers.find(s => s.name.toLowerCase() === newName.toLowerCase());
+            if (existingSupplier && existingSupplier.name !== oldName) {
+                alert('Bu isimde bir tedarikçi zaten mevcut.');
+                return;
+            }
+
+            // Update in suppliers collection
+            const supplierToUpdate = suppliers.find(s => s.name === oldName);
+            if (supplierToUpdate) {
+                await setDoc(doc(db, 'suppliers', supplierToUpdate.id), {
+                    name: newName.trim(),
+                    createdAt: supplierToUpdate.createdAt
+                });
+            }
+
+            // Update in all products
+            const affectedProducts = products.filter(p =>
+                p.suppliers.some(s => s.name === oldName)
+            );
+
+            if (affectedProducts.length > 0) {
+                const batch = writeBatch(db);
+                affectedProducts.forEach(product => {
+                    const updatedSuppliers = product.suppliers.map(s =>
+                        s.name === oldName ? { ...s, name: newName.trim() } : s
+                    );
+                    const productRef = doc(db, 'products', product.id);
+                    batch.update(productRef, { suppliers: updatedSuppliers });
+                });
+                await batch.commit();
+            }
+
+            // Update local state
+            setProducts(prevProducts =>
+                prevProducts.map(product => ({
+                    ...product,
+                    suppliers: product.suppliers.map(s =>
+                        s.name === oldName ? { ...s, name: newName.trim() } : s
+                    )
+                }))
+            );
+        } catch (error) {
+            console.error('Error updating supplier:', error);
+            alert('Tedarikçi güncellenirken hata oluştu.');
+        }
+    };
+
     const deleteSupplier = async (supplierName: string) => {
         try {
             // Find and delete from suppliers collection
@@ -314,6 +374,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
             getProductsBySupplier,
             deleteSupplier,
             addSupplier,
+            updateSupplier,
             addReturn,
             updateReturn,
             toggleReturnStatus,

@@ -62,6 +62,7 @@ export interface ProductContextType {
   getProductsBySupplier: (supplierName: string) => SupplierInfo | null;
   deleteSupplier: (supplierName: string) => void;
   addSupplier: (name: string) => Promise<void>;
+  updateSupplier: (oldName: string, newName: string) => Promise<void>;
   addReturn: (item: Omit<ReturnItem, 'id'>) => void;
   updateReturn: (id: string, item: Partial<ReturnItem>) => void;
   toggleReturnStatus: (id: string, currentStatus: boolean) => void;
