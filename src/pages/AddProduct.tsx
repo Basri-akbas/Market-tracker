@@ -96,6 +96,16 @@ const AddProduct: React.FC = () => {
             }
         }
 
+        // Check for duplicate product name (brand + name combination)
+        const duplicateProduct = products.find(p =>
+            p.brand.toLowerCase() === formData.brand.toLowerCase() &&
+            p.name.toLowerCase() === formData.name.toLowerCase()
+        );
+        if (duplicateProduct) {
+            setError(`Bu ürün zaten kayıtlı: "${duplicateProduct.brand} - ${duplicateProduct.name}"${duplicateProduct.barcode ? ` (Barkod: ${duplicateProduct.barcode})` : ''}. Lütfen farklı bir ürün ekleyin.`);
+            return;
+        }
+
         // Basic validation
         if (!formData.brand || !formData.name || !formData.salesPrice) {
             setError('Lütfen marka, ürün adı ve satış fiyatı alanlarını doldurun.');
