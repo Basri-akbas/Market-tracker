@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const AddProduct: React.FC = () => {
     const navigate = useNavigate();
-    const { addProduct, suppliers: availableSuppliers, addSupplier, getUniqueSuppliers } = useProducts();
+    const { addProduct, suppliers: availableSuppliers, addSupplier, getUniqueSuppliers, products } = useProducts();
     const barcodeInputRef = useRef<HTMLInputElement>(null);
 
     // Combine suppliers from collection and products
@@ -84,6 +84,17 @@ const AddProduct: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+
+        // Check for duplicate barcode
+        if (formData.barcode.trim()) {
+            const existingProduct = products.find(p =>
+                p.barcode.toLowerCase() === formData.barcode.toLowerCase()
+            );
+            if (existingProduct) {
+                setError(`Bu barkod zaten kayıtlı: "${existingProduct.brand} - ${existingProduct.name}". Lütfen farklı bir barkod girin veya barkod alanını boş bırakın.`);
+                return;
+            }
+        }
 
         // Basic validation
         if (!formData.brand || !formData.name || !formData.salesPrice) {
