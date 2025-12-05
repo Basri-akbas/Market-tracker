@@ -91,7 +91,7 @@ const SupplierReturns: React.FC = () => {
             quantity: newItem.quantity,
             date: Date.now(),
             isReturned: false,
-            image: newItem.image || null,
+            image: newItem.image || undefined,
         });
 
         setNewItem({ brand: '', productName: '', weight: '', quantity: 1, image: '' });
