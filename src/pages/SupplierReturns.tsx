@@ -19,6 +19,7 @@ const SupplierReturns: React.FC = () => {
         weight: '',
         quantity: 1,
         image: '',
+        notes: '',
     });
     const [viewImage, setViewImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -92,9 +93,10 @@ const SupplierReturns: React.FC = () => {
             date: Date.now(),
             isReturned: false,
             image: newItem.image || undefined,
+            notes: newItem.notes || undefined,
         });
 
-        setNewItem({ brand: '', productName: '', weight: '', quantity: 1, image: '' });
+        setNewItem({ brand: '', productName: '', weight: '', quantity: 1, image: '', notes: '' });
         setShowAddForm(false);
     };
 
@@ -191,6 +193,17 @@ const SupplierReturns: React.FC = () => {
                                     required
                                 />
                             </div>
+                        </div>
+
+                        {/* Notes */}
+                        <div className="input-group">
+                            <label className="label">Not (İsteğe Bağlı)</label>
+                            <textarea
+                                value={newItem.notes}
+                                onChange={(e) => setNewItem({ ...newItem, notes: e.target.value })}
+                                className="input min-h-[80px]"
+                                placeholder="İade hakkında not ekleyin..."
+                            />
                         </div>
 
                         {/* Photo Upload */}

@@ -167,6 +167,11 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
                 cleanItem.image = item.image;
             }
 
+            // Only add notes if it exists
+            if (item.notes) {
+                cleanItem.notes = item.notes;
+            }
+
             await addDoc(collection(db, 'returns'), cleanItem);
         } catch (error) {
             console.error('Error adding return:', error);

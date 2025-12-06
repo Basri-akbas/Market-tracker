@@ -34,6 +34,7 @@ export interface ReturnItem {
   date: number;
   isReturned: boolean;
   image?: string; // Base64 encoded image
+  notes?: string; // Additional notes
 }
 
 export interface SupplierPhoto {
