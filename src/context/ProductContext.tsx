@@ -151,7 +151,23 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     const addReturn = async (item: Omit<ReturnItem, 'id'>) => {
         try {
-            await addDoc(collection(db, 'returns'), item);
+            // Remove undefined fields for Firebase
+            const cleanItem: any = {
+                supplierName: item.supplierName,
+                brand: item.brand,
+                productName: item.productName,
+                weight: item.weight,
+                quantity: item.quantity,
+                date: item.date,
+                isReturned: item.isReturned,
+            };
+
+            // Only add image if it exists
+            if (item.image) {
+                cleanItem.image = item.image;
+            }
+
+            await addDoc(collection(db, 'returns'), cleanItem);
         } catch (error) {
             console.error('Error adding return:', error);
             alert('İade eklenirken hata oluştu.');
