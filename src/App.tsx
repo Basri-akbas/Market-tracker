@@ -11,6 +11,7 @@ import ProductDetail from './pages/ProductDetail';
 import Stats from './pages/Stats';
 import SupplierList from './pages/SupplierList';
 import SupplierDetail from './pages/SupplierDetail';
+import SupplierStatistics from './pages/SupplierStatistics';
 import ReturnsDashboard from './pages/ReturnsDashboard';
 import SupplierReturns from './pages/SupplierReturns';
 
@@ -28,6 +29,7 @@ function App() {
             <Route path="product/:id" element={<ProductDetail />} />
             <Route path="suppliers" element={<SupplierList />} />
             <Route path="supplier/:name" element={<SupplierDetail />} />
+            <Route path="suppliers/:supplierName/stats" element={<SupplierStatistics />} />
             <Route path="stats" element={<Stats />} />
             <Route path="returns" element={<ReturnsDashboard />} />
             <Route path="returns/:supplierName" element={<SupplierReturns />} />

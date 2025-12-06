@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Package, Search, Trash2, Plus, Edit2 } from 'lucide-react';
+import { Users, Package, Search, Trash2, Plus, Edit2, BarChart3 } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 
 const SupplierList: React.FC = () => {
@@ -101,6 +101,14 @@ const SupplierList: React.FC = () => {
                                 <div className="text-slate-300 group-hover:text-emerald-500">
                                     →
                                 </div>
+                                <Link
+                                    to={`/suppliers/${encodeURIComponent(supplier.name)}/stats`}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="p-2 text-purple-300 hover:text-purple-500 transition-colors"
+                                    title="İstatistikler"
+                                >
+                                    <BarChart3 size={18} />
+                                </Link>
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
