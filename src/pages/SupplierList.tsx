@@ -87,7 +87,7 @@ const SupplierList: React.FC = () => {
                                     <Users size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold text-slate-800 group-hover:text-emerald-600 transition-colors">
+                                    <h3 className="text-sm font-semibold text-slate-800 group-hover:text-emerald-600 transition-colors">
                                         {supplier.name}
                                     </h3>
                                     <div className="text-sm text-slate-500 flex items-center gap-1">

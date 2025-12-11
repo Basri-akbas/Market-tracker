@@ -116,7 +116,7 @@ const ProductList: React.FC = () => {
                                     <span className="badge bg-slate-100 text-slate-600">{product.brand}</span>
                                     <span className="text-xs text-slate-400 font-mono">{product.barcode}</span>
                                 </div>
-                                <h3 className="text-lg font-semibold text-slate-800 group-hover:text-emerald-600 transition-colors">
+                                <h3 className="text-sm font-semibold text-slate-800 group-hover:text-emerald-600 transition-colors">
                                     {product.name}
                                 </h3>
                                 <div className="text-sm text-slate-500">
@@ -125,7 +125,7 @@ const ProductList: React.FC = () => {
                             </div>
 
                             <div className="text-right mr-4">
-                                <div className="text-lg font-bold text-emerald-600">
+                                <div className="text-base font-bold text-emerald-600">
                                     {product.salesPrice.toFixed(2)} ₺
                                 </div>
                                 <div className="text-xs text-slate-400">Satış Fiyatı</div>
